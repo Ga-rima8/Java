@@ -82,7 +82,7 @@ body {
 
 .sidebar-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.15); /* subtle white line */
+    background: #2d4a38;
     margin: 0 0 14px;
 }
 
