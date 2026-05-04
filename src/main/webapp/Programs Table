@@ -1,0 +1,10 @@
+CREATE TABLE programs (
+    program_id INT PRIMARY KEY,
+    program_name VARCHAR(100) NOT NULL
+);
+
+-- Inserting the specific values from your HTML <option> tags
+INSERT INTO programs (program_id, program_name) VALUES 
+(2, 'Bachelor in Computing'),
+(5, 'Bachelor in Multimedia'),
+(6, 'Bachelor in Networking');

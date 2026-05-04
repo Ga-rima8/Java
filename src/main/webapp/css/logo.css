@@ -1,0 +1,84 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-image: url("../images/Hangaurabg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.title {
+  font-size: 10vmin;
+  font-family: "Sekuya", system-ui;
+  font-weight: 100;
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  color: #ffffff;
+  line-height: 1;
+  text-shadow:
+    1px 1px 0 #000,
+    2px 2px 0 #222,
+    3px 3px 0 #333,
+    0 0 30px rgba(255, 255, 255, 0.3),
+    0 0 60px rgba(255, 255, 255, 0.15);
+}
+
+.letter {
+  display: inline-block;
+  transition: color 0.15s ease;
+}
+
+.deer {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  top: -41px;
+  left: -70px;
+  z-index: 20;
+  animation: runAcross 2.0s linear forwards;
+}
+
+.deer img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform: scaleX(-1);
+  filter: brightness(0) invert(1);
+}
+
+.deer.settled {
+  animation: none;
+  transition: top 0.4s cubic-bezier(.22, 1, .36, 1);
+  top: 15px;
+  left: calc(100% + 5px);
+}
+
+@keyframes runAcross {
+  0%   { left: -70px; }
+  100% { left: 100%;  }
+}
+
+@keyframes jiggle {
+  0%   { transform: scaleX(1)    scaleY(1);    }
+  20%  { transform: scaleX(1.3)  scaleY(0.7);  }
+  45%  { transform: scaleX(0.85) scaleY(1.2);  }
+  65%  { transform: scaleX(1.08) scaleY(0.93); }
+  80%  { transform: scaleX(0.97) scaleY(1.04); }
+  100% { transform: scaleX(1)    scaleY(1);    }
+}
+
+.jiggle {
+  animation: jiggle 0.35s ease-out forwards;
+}

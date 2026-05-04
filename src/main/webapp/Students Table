@@ -1,0 +1,18 @@
+CREATE TABLE students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    dob DATE NOT NULL,
+    gender ENUM('Male', 'Female') NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    number VARCHAR(20) NOT NULL, -- Mapped from your 'number' input
+    password VARCHAR(255) NOT NULL,    -- Use a long length for hashed passwords
+    program_id INT NOT NULL,
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Relationship linking to the programs table
+    CONSTRAINT fk_program 
+        FOREIGN KEY (program_id) 
+        REFERENCES programs(program_id)
+);
