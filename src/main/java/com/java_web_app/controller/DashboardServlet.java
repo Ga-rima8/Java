@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/dashboard")  // was /admin/dashboard, sidebar links to /dashboard
+@WebServlet("/dashboard")  
 public class DashboardServlet extends HttpServlet {
 
     private AdminDAO adminDAO;

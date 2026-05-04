@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class AdminDAO {
     
-    // Get total counts for dashboard cards
+    // Get total counts for dashboard cards.....
     public Map<String, Integer> getDashboardCounts() {
         Map<String, Integer> counts = new HashMap<>();
         String sql = "SELECT " +
@@ -36,7 +36,7 @@ public class AdminDAO {
         return counts;
     }
     
-    // Get all events for the admin to view
+    
     public List<Map<String, Object>> getAllEvents() {
         List<Map<String, Object>> events = new ArrayList<>();
         String sql = "SELECT e.*, h.Name as host_name, c.Title as category_title " +

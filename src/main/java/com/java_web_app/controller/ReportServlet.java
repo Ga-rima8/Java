@@ -21,12 +21,12 @@ public class ReportServlet extends HttpServlet {
             Statement st = con.createStatement();
             ResultSet rs;
 
-            // Total bookings = total event_registrations
+            // Total bookings 
             rs = st.executeQuery("SELECT COUNT(*) FROM event_registration");
             rs.next(); int total = rs.getInt(1);
             request.setAttribute("totalBookings", total);
 
-            // Your DB has no status column — treat all as confirmed
+            
             request.setAttribute("confirmedBookings", total);
             request.setAttribute("pendingBookings", 0);
             request.setAttribute("cancelledBookings", 0);
@@ -35,7 +35,7 @@ public class ReportServlet extends HttpServlet {
             request.setAttribute("cancelledPct", 0);
             request.setAttribute("cancelRate", 0);
 
-            // Total revenue = SUM of event prices for all registrations
+            
             rs = st.executeQuery(
                 "SELECT COALESCE(SUM(e.Event_price), 0) " +
                 "FROM event_registration er " +

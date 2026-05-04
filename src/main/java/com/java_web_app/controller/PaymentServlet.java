@@ -21,7 +21,7 @@ public class PaymentServlet extends HttpServlet {
             Statement st = con.createStatement();
             ResultSet rs;
 
-            // Total earnings = sum of all event prices from registrations
+            
             rs = st.executeQuery(
                 "SELECT COALESCE(SUM(e.Event_price), 0) " +
                 "FROM event_registration er " +
@@ -37,11 +37,11 @@ public class PaymentServlet extends HttpServlet {
             rs.next();
             request.setAttribute("totalTransactions", rs.getInt(1));
 
-            // No payments table — refunds are 0
+           
             request.setAttribute("totalRefunds", 0);
             request.setAttribute("refundCount",  0);
 
-            // All "transactions" = each registration with event price
+            
             rs = st.executeQuery(
                 "SELECT er.Event_registration_id, v.Name AS visitor_name, " +
                 "e.Title AS event_title, e.Event_price, er.Registration_date " +
@@ -58,8 +58,8 @@ public class PaymentServlet extends HttpServlet {
                 p.put("eventName",   rs.getString("event_title"));
                 p.put("amount",      rs.getString("Event_price"));
                 p.put("paymentDate", rs.getString("Registration_date"));
-                p.put("method",      "On-site");   // no method column in your DB
-                p.put("type",        "Payment");   // no type column in your DB
+                p.put("method",      "On-site");   
+                p.put("type",        "Payment");   
                 payments.add(p);
             }
             request.setAttribute("payments", payments);

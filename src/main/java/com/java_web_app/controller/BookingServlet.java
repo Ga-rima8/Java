@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
-@WebServlet("/booking")  // fixed: sidebar links to /booking
+@WebServlet("/booking")  
 public class BookingServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -20,7 +20,7 @@ public class BookingServlet extends HttpServlet {
             Connection con = DBconfig.getConnection();
             Statement st = con.createStatement();
 
-            // All bookings from event_registration (your actual table)
+            // All bookings from eventreg
             ResultSet rs = st.executeQuery(
                 "SELECT er.Event_registration_id, v.Name AS visitor_name, v.Email AS visitor_email, " +
                 "e.Title AS event_title, e.Event_price, e.Event_location, er.Registration_date " +
