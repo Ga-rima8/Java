@@ -32,10 +32,10 @@
       <li><a href="<%=path%>/home.jsp">Home</a></li>
       <!-- Adventure link navigates to the Ghost Elements adventure portal -->
       <li><a href="Adventure.jsp">Adventure</a></li>
-      <li><a href="Adventure.jsp">Social</a></li>
-      <li><a href="Adventure.jsp">Creative</a></li>
-      <li><a href="Adventure.jsp">Trails</a></li>
-      <li><a href="Adventure.jsp">About Us</a></li>
+      <li><a href="Social.jsp">Social</a></li>
+      <li><a href="Creative.jsp">Creative</a></li>
+      <li><a href="Trails.jsp">Trails</a></li>
+      <li><a href="aboutus.jsp">About Us</a></li>
     </ul>
     <div class="nav-buttons">
       <button class="nav-host" id="open-host-modal">Host Event</button>
@@ -97,15 +97,15 @@
         <h1 slot="header">Adventure</h1>
         <p slot="content">Join the excitement to move the adrenaline.</p>
       </card>
-      <card data-image="<%=path%>/img/creative.png" alt="Creative" link="<%=path%>/Adventure.jsp">
+      <card data-image="<%=path%>/img/creative.png" alt="Creative" link="<%=path%>/	Creative.jsp">
         <h1 slot="header">Creative</h1>
         <p slot="content">Let the inner voice speak and blend.</p>
       </card>
-      <card data-image="<%=path%>/img/social.png" alt="Social" link="<%=path%>/Adventure.jsp">
+      <card data-image="<%=path%>/img/social.png" alt="Social" link="<%=path%>/Social.jsp">
         <h1 slot="header">Social</h1>
         <p slot="content">Help humans to be human. Join the social hub ASAP.</p>
       </card>
-      <card data-image="<%=path%>/img/trails.png" alt="Trails" link="<%=path%>/Adventure.jsp">
+      <card data-image="<%=path%>/img/trails.png" alt="Trails" link="<%=path%>/Trails.jsp">
         <h1 slot="header">Trails</h1>
         <p slot="content">Make your journey more exciting and memorable.</p>
       </card>
