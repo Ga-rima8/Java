@@ -181,7 +181,7 @@
                 <i class="fas fa-camera"></i> Change Photo
               </label>
               <input type="file" id="profileImageInput" name="profileImage"
-                     class="file-input-hidden" accept="image/jpeg,image/png,image/gif,image/webp"
+                     class="file-input-hidden" accept="image/jpg,image/png,image/gif,image/webp"
                      onchange="previewImage(this)">
             </div>
           </div>

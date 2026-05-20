@@ -3,35 +3,111 @@ package com.hangaura.service;
 import com.hangaura.Model.UserModel;
 import com.hangaura.utils.DBConfig;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
- * UserService — higher-level service wrapping UserDAO operations.
+ * Service layer for the `user` table.
  *
- * TABLE NAME : user         (no trailing 's' — matches DB schema)
- * PK column  : user_id
- * login col  : username     (NOT user_name)
- * image col  : profile_image  LONGBLOB
+ * DB columns:
+ *   user_id, first_name, last_name, username, email,
+ *   number, gender, dob, password, profile_image,
+ *   program_id, created_at
+ *
+ * TABLE NAME: `user`  (NOT `users`)
+ * PHONE COLUMN: `number`  (NOT `phone`)
  */
 public class UserService {
 
-    // ═══════════════════════════════════════════════════════
-    //  UPDATE USER  (called by ProfileServlet)
-    // ═══════════════════════════════════════════════════════
-    public boolean updateUser(UserModel user) {
+    // ── Shared row mapper ──────────────────────────────────────────────────
 
-        String sql = "UPDATE user SET "
-                   + "  first_name    = ?, "
-                   + "  last_name     = ?, "
-                   + "  username      = ?, "    // column is `username`, NOT `user_name`
-                   + "  email         = ?, "
-                   + "  number        = ?, "
-                   + "  dob           = ?, "
-                   + "  gender        = ?, "
-                   + "  password      = ?, "
-                   + "  profile_image = ?, "
-                   + "  program_id    = ? "
-                   + "WHERE user_id   = ?";
+    private UserModel mapRow(ResultSet rs) throws Exception {
+        UserModel user = new UserModel();
+        user.setUserId   (rs.getInt   ("user_id"));
+        user.setFirstName(rs.getString("first_name"));
+        user.setLastName (rs.getString("last_name"));
+        user.setUserName (rs.getString("username"));
+        user.setEmail    (rs.getString("email"));
+        user.setNumber   (rs.getString("number"));
+        user.setGender   (rs.getString("gender"));
+        user.setDob      (rs.getDate  ("dob"));
+        user.setPassword (rs.getString("password"));
+        user.setProgramId(rs.getInt   ("program_id"));
+        byte[] img = rs.getBytes("profile_image");
+        if (img != null && img.length > 0) {
+            user.setProfileImage(img);
+        }
+        return user;
+    }
+
+    // ── Get user by ID ─────────────────────────────────────────────────────
+
+    public UserModel getUserById(int userId) {
+        String sql = "SELECT * FROM user WHERE user_id = ?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ── Get user by username (for login) ───────────────────────────────────
+
+    public UserModel getUserByUsername(String username) {
+        String sql = "SELECT * FROM user WHERE username = ?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ── Get user by email ──────────────────────────────────────────────────
+
+    public UserModel getUserByEmail(String email) {
+        String sql = "SELECT * FROM user WHERE email = ?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ── Update user profile ────────────────────────────────────────────────
+    //
+    // Two SQL variants:
+    //   WITH image    → also updates profile_image column
+    //   WITHOUT image → leaves profile_image column untouched in DB
+
+    public boolean updateUser(UserModel user) {
+        boolean hasImage = user.getProfileImage() != null
+                        && user.getProfileImage().length > 0;
+
+        String sql = hasImage
+            ? "UPDATE user SET " +
+              "first_name=?, last_name=?, username=?, email=?, " +
+              "number=?, gender=?, dob=?, password=?, profile_image=? " +
+              "WHERE user_id=?"
+            : "UPDATE user SET " +
+              "first_name=?, last_name=?, username=?, email=?, " +
+              "number=?, gender=?, dob=?, password=? " +
+              "WHERE user_id=?";
 
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -41,116 +117,69 @@ public class UserService {
             ps.setString(3, user.getUserName());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getNumber());
-
-            if (user.getDob() != null) {
-                ps.setDate(6, user.getDob());
-            } else {
-                ps.setNull(6, Types.DATE);
-            }
-
-            ps.setString(7, user.getGender());
+            ps.setString(6, user.getGender());
+            ps.setDate  (7, user.getDob());
             ps.setString(8, user.getPassword());
 
-            byte[] img = user.getProfileImage();
-            if (img != null && img.length > 0) {
-                ps.setBytes(9, img);
+            if (hasImage) {
+                ps.setBytes(9,  user.getProfileImage());
+                ps.setInt  (10, user.getUserId());
             } else {
-                ps.setNull(9, Types.LONGVARBINARY);
+                ps.setInt  (9, user.getUserId());
             }
-
-            ps.setInt(10, user.getProgramId());
-            ps.setInt(11, user.getUserId());
 
             return ps.executeUpdate() > 0;
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  GET USER BY ID
-    // ═══════════════════════════════════════════════════════
-    public UserModel getUserById(int id) {
-        String sql = "SELECT * FROM user WHERE user_id = ?";
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  GET USER BY USERNAME
-    // ═══════════════════════════════════════════════════════
-    public UserModel getUserByUsername(String username) {
-        String sql = "SELECT * FROM user WHERE username = ?";   // column: username
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  DELETE USER
-    // ═══════════════════════════════════════════════════════
-    public boolean deleteUser(int userId) {
-        String sql = "DELETE FROM user WHERE user_id = ?";
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  USERNAME EXISTS CHECK
-    // ═══════════════════════════════════════════════════════
+    // ── Update password only ───────────────────────────────────────────────
+
+    public boolean updatePassword(int userId, String hashedPassword) {
+        String sql = "UPDATE user SET password=? WHERE user_id=?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, hashedPassword);
+            ps.setInt   (2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // ── Check if username already taken ───────────────────────────────────
+
     public boolean usernameExists(String username) {
-        String sql = "SELECT user_id FROM user WHERE username = ?";   // column: username
+        String sql = "SELECT 1 FROM user WHERE username = ?";
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  SHARED ROW MAPPER
-    // ═══════════════════════════════════════════════════════
-    private UserModel mapRow(ResultSet rs) throws SQLException {
-        UserModel u = new UserModel();
-        u.setUserId      (rs.getInt   ("user_id"));
-        u.setFirstName   (rs.getString("first_name"));
-        u.setLastName    (rs.getString("last_name"));
-        u.setUserName    (rs.getString("username"));        // column: username
-        u.setEmail       (rs.getString("email"));
-        u.setNumber      (rs.getString("number"));
-        u.setGender      (rs.getString("gender"));
-        u.setDob         (rs.getDate  ("dob"));
-        u.setPassword    (rs.getString("password"));
-        u.setProfileImage(rs.getBytes ("profile_image"));
-        u.setProgramId   (rs.getInt   ("program_id"));
-        return u;
+    // ── Check if email already taken ──────────────────────────────────────
+
+    public boolean emailExists(String email) {
+        String sql = "SELECT 1 FROM user WHERE email = ?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

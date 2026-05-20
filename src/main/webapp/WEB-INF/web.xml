@@ -13,4 +13,9 @@
     <location>/WEB-INF/Pages/404.jsp</location>
 </error-page>
 
+<error-page>
+  <error-code>505</error-code>
+  <location>/WEB-INF/Pages/505.jsp</location>
+</error-page>
+
 </web-app>
